@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
   const [text, setText] = useState('');
 
+  useEffect(() => {
+    const fetchSavedText = async () => {
+      try {
+        const response = await axios.get('https://copyapp-2.onrender.com/all');
+        if (response.status === 200 && response.data.count > 0) {
+          setText(response.data.data[0].content);
+        }
+      } catch (err) {
+        console.error('Failed to fetch saved content', err);
+      }
+    };
+
+    fetchSavedText();
+  }, []);
+
   const saveText = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/save', { content: text });
+      const response = await axios.post('https://copyapp-2.onrender.com/save', { content: text });
       if (response.status === 201) {
         setText(response.data.content); // Update textarea with saved content
         alert('Saved and refreshed from DB!');
